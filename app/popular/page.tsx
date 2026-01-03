@@ -111,7 +111,7 @@ export default async function PopularPage() {
               brand="What to Watch"
               links={[
                 { label: "Home", href: "/" },
-                {label: "popular", href: "/popular"}
+          { label: "popular", href: "/popular" }
               ]}
             />
 
