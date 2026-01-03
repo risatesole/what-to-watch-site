@@ -87,6 +87,13 @@ type MovieItem = {
   overview: string;
 };
 
+
+export const metadata = {
+  title: "Popular Movies and TV Shows",
+};
+
+
+
 export default async function PopularPage() {
   const tvShowData = await getPopularTvshows();
   const moviesData = await getPopularMovies();
