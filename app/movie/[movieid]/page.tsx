@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 
 type PageProps = {
-  params: { movieid: string } | Promise<{ movieid: string }>;
+  params: Promise<{ movieid: string }>;
 };
 
 async function getMovieDetails(id: string) {
