@@ -89,7 +89,7 @@ type MovieItem = {
 
 
 export const metadata = {
-  title: "Popular Movies and TV Shows",
+  title: "What To Watch - Popular Movies and TV Shows",
 };
 
 
@@ -114,13 +114,13 @@ export default async function PopularPage() {
 
   return (
     <div>
-            <Navbar
-              brand="What to Watch"
-              links={[
-                { label: "Home", href: "/" },
+      <Navbar
+        brand="What to Watch"
+        links={[
+          { label: "Home", href: "/" },
           { label: "popular", href: "/popular" }
-              ]}
-            />
+        ]}
+      />
 
       <h2>Welcome to the popular content page</h2>
       <h3>Popular tv shows: </h3>

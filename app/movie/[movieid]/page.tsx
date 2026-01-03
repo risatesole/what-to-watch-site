@@ -3,11 +3,11 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 
 type PageProps = {
-  params: Promise<{ movieid: string }>;
+  params: { movieid: string };
 };
 
 async function getMovieDetails(id: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASEAPIURL||"http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_BASEAPIURL || "http://localhost:3000";
   const res = await fetch(`${baseUrl}/api/movie/details`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -25,8 +25,15 @@ async function getMovieDetails(id: string) {
   return data;
 }
 
+export async function generateMetadata({ params }: PageProps) {
+  const moviedata = await getMovieDetails(params.movieid);
+  return {
+    title: moviedata.title + " - What To Watch",
+  };
+}
+
 export default async function MovieDetailsPage({ params }: PageProps) {
-  const { movieid } = await params;
+  const { movieid } = params;
 
   const moviedata = await getMovieDetails(movieid);
 
@@ -100,7 +107,7 @@ export default async function MovieDetailsPage({ params }: PageProps) {
 
       <p>Movie homepage:</p>
       <p>
-        <Link href={moviedata.homepage}>Home page of the movie</Link>
+        <Link href={moviedata.homepage}>page of the movie</Link>
       </p>
 
       {/* <p>
