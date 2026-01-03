@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 
 type PageProps = {
-  params: { movieid: string };
+  params: { movieid: string } | Promise<{ movieid: string }>;
 };
 
 async function getMovieDetails(id: string) {
@@ -21,98 +21,81 @@ async function getMovieDetails(id: string) {
     throw new Error(`Failed to fetch movie details. Status: ${res.status}`);
   }
 
-  const data = await res.json();
-  return data;
+  return res.json();
 }
 
-export async function generateMetadata({ params }: PageProps) {
-  const moviedata = await getMovieDetails(params.movieid);
+export async function generateMetadata(props: PageProps) {
+  const resolvedParams = await props.params;
+  const movieid = resolvedParams.movieid;
+
+  const moviedata = await getMovieDetails(movieid);
   return {
-    title: moviedata.title + " - What To Watch",
+    title: `${moviedata.title} - What To Watch`,
   };
 }
 
-export default async function MovieDetailsPage({ params }: PageProps) {
-  const { movieid } = params;
+export default async function MovieDetailsPage(props: PageProps) {
+  const resolvedParams = await props.params;
+  const movieid = resolvedParams.movieid;
 
   const moviedata = await getMovieDetails(movieid);
 
   return (
     <div style={{ padding: "20px" }}>
-      <img
-        src={`https://image.tmdb.org/t/p/original${moviedata.belongs_to_collection?.poster_path}`}
-        alt={`${moviedata.title} backdrop`}
-        title="Front poster"
-        style={{
-          width: "100%",
-          maxHeight: "400px",
-          objectFit: "cover",
-          marginTop: "20px",
-        }}
-      />
+      {moviedata.belongs_to_collection?.poster_path && (
+        <img
+          src={`https://image.tmdb.org/t/p/original${moviedata.belongs_to_collection.poster_path}`}
+          alt={`${moviedata.title} collection poster`}
+          style={{ width: "100%", maxHeight: 400, objectFit: "cover", marginTop: 20 }}
+        />
+      )}
 
-      <img
-        src={`https://image.tmdb.org/t/p/original${moviedata.backdrop_path}`}
-        alt={`${moviedata.title} backdrop`}
-        title="Backdoor cover"
-        style={{
-          width: "100%",
-          maxHeight: "400px",
-          objectFit: "cover",
-          marginTop: "20px",
-        }}
-      />
+      {moviedata.backdrop_path && (
+        <img
+          src={`https://image.tmdb.org/t/p/original${moviedata.backdrop_path}`}
+          alt={`${moviedata.title} backdrop`}
+          style={{ width: "100%", maxHeight: 400, objectFit: "cover", marginTop: 20 }}
+        />
+      )}
 
-      <img
-        src={`https://image.tmdb.org/t/p/original${moviedata.belongs_to_collection?.backdrop_path}`}
-        alt={`${moviedata.title} backdrop`}
-        title="Backdrop of collection image"
-        style={{
-          width: "100%",
-          maxHeight: "400px",
-          objectFit: "cover",
-          marginTop: "20px",
-        }}
-      />
+      {moviedata.belongs_to_collection?.backdrop_path && (
+        <img
+          src={`https://image.tmdb.org/t/p/original${moviedata.belongs_to_collection.backdrop_path}`}
+          alt={`${moviedata.title} collection backdrop`}
+          style={{ width: "100%", maxHeight: 400, objectFit: "cover", marginTop: 20 }}
+        />
+      )}
 
       <img
         src={`https://image.tmdb.org/t/p/w200${moviedata.poster_path}`}
         alt={`${moviedata.title} poster`}
-        style={{ borderRadius: "8px", marginTop: "20px" }}
+        style={{ borderRadius: 8, marginTop: 20 }}
       />
 
-      <h1 style={{ fontSize: "2rem", marginTop: "20px" }}>{moviedata.title}</h1>
+      <h1 style={{ fontSize: 32, marginTop: 20 }}>{moviedata.title}</h1>
       <p>{moviedata.overview}</p>
-      <p>
-        <strong>Release Date:</strong> {moviedata.release_date}
-      </p>
 
-      <p>
-        This movie belongs to collection:{" "}
-        <b>{moviedata.belongs_to_collection?.name || "None"}</b>
-      </p>
+      <p><strong>Release Date:</strong> {moviedata.release_date}</p>
+      <p>Collection: <b>{moviedata.belongs_to_collection?.name || "None"}</b></p>
 
       <p>Genres:</p>
       <pre>{JSON.stringify(moviedata.genres, null, 2)}</pre>
 
-      <p>
-        <b>Production company:</b>
-      </p>
-      <p>{moviedata.production_companies[0]?.name}</p>
-      <img
-        src={`https://image.tmdb.org/t/p/w200${moviedata.production_companies[0]?.logo_path}`}
-        alt={`${moviedata.title} production company logo`}
-        style={{ borderRadius: "8px", marginTop: "20px" }}
-      />
+      <p><b>Production company:</b> {moviedata.production_companies[0]?.name || "N/A"}</p>
+      {moviedata.production_companies[0]?.logo_path && (
+        <img
+          src={`https://image.tmdb.org/t/p/w200${moviedata.production_companies[0].logo_path}`}
+          alt={`${moviedata.title} production logo`}
+          style={{ borderRadius: 8, marginTop: 20 }}
+        />
+      )}
 
       <p>Movie homepage:</p>
-      <p>
-        <Link href={moviedata.homepage}>page of the movie</Link>
-      </p>
-
-      {/* <p>
-        <pre>{JSON.stringify(moviedata, null, 2)}</pre>
-      </p> */}
+      {moviedata.homepage && (
+        <p>
+          <Link href={moviedata.homepage}>{moviedata.homepage}</Link>
+        </p>
+      )}
     </div>
   );
 }

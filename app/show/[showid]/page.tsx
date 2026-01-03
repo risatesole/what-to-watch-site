@@ -24,13 +24,12 @@ async function getShowDetails(id: string) {
   return data;
 }
 
-// function ShowJsonInFrontend(data: any) {
-//   return (
-//     <p>
-//       <pre>{JSON.stringify(data, null, 2)}</pre>
-//     </p>
-//   );
-// }
+export async function generateMetadata({ params }: PageProps) {
+  const showData = await getShowDetails((await params).showid);
+  return {
+    title: showData.name + " - What To Watch",
+  };
+}
 
 export default async function MovieDetailsPage({ params }: PageProps) {
   const { showid } = await params;
@@ -69,7 +68,8 @@ export default async function MovieDetailsPage({ params }: PageProps) {
         <Link href={showdata.homepage}>Show page</Link>
       </p>
 
-      {/* <ShowJsonInFrontend data={showdata} /> */}
+      {/* <p>Data:</p>
+       <pre>{JSON.stringify(showdata, null, 2)}</pre> */}
     </div>
   );
 }
